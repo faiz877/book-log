@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: [true, "Please enter username"],
-    minlength: [3, "Username must be of minimum 6 characters"],
+    minlength: [3, "Username must be of minimum 3 characters"],
     unique: [true, "Username already exists"],
   },
   password: {
@@ -30,13 +30,11 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-//hashing
 userSchema.pre("save", async function () {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-//create jwt
 userSchema.methods.createJWT = function () {
   return jwt.sign(
     { userId: this._id, name: this.name },
@@ -47,7 +45,6 @@ userSchema.methods.createJWT = function () {
   );
 };
 
-//check password
 userSchema.methods.comparePassword = async function (candidatePassword) {
   const isMatch = await bcrypt.compare(candidatePassword, this.password);
   return isMatch;
