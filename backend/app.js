@@ -35,9 +35,9 @@ app.use("/api/v1/wishlist", authenticateUser, wishlistRouter);
 app.use(errorHandler);
 
 // Catch-all route for undefined routes
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
+// app.use((req, res) => {
+//   res.status(404).json({ message: "Route not found" });
+// });
 
 //start the server
 const port = process.env.PORT || 3000;

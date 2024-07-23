@@ -1,12 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import api from "../services/api";
+import api from "../services/api"; // Make sure this is your API instance
 import useAuthStore from "../store/authStore";
 
 const useBooks = () => {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
 
-  const { data: books = [] } = useQuery(
+  // Fetch books
+  const {
+    data: books = [],
+    isLoading,
+    error,
+  } = useQuery(
     "books",
     async () => {
       const response = await api.get("/books");
@@ -17,13 +22,60 @@ const useBooks = () => {
     }
   );
 
-  // ... rest of the hook implementation
+  // Add book mutation
+  const addBookMutation = useMutation(
+    async (newBook) => {
+      const response = await api.post("/books", newBook);
+      return response.data;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("books");
+      },
+      onError: (error) => {
+        console.error("Add book error:", error);
+      },
+    }
+  );
+
+  // Update book mutation
+  const updateBookMutation = useMutation(
+    async ({ id, updatedBook }) => {
+      const response = await api.put(`/books/${id}`, updatedBook);
+      return response.data;
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("books");
+      },
+      onError: (error) => {
+        console.error("Update book error:", error);
+      },
+    }
+  );
+
+  // Delete book mutation
+  const deleteBookMutation = useMutation(
+    async (id) => {
+      await api.delete(`/books/${id}`);
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("books");
+      },
+      onError: (error) => {
+        console.error("Delete book error:", error);
+      },
+    }
+  );
 
   return {
     books,
-    addBook: addBook.mutate,
-    updateBook: updateBook.mutate,
-    deleteBook: deleteBook.mutate,
+    isLoading,
+    error,
+    addBook: addBookMutation.mutate,
+    updateBook: updateBookMutation.mutate,
+    deleteBook: deleteBookMutation.mutate,
   };
 };
 
