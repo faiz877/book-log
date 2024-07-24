@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Grid } from "@mui/material";
+import { TextField, Button, Grid, Typography } from "@mui/material";
 
 const BookForm = ({ onSubmit, initialData = {} }) => {
   const [formData, setFormData] = useState({
@@ -8,10 +8,18 @@ const BookForm = ({ onSubmit, initialData = {} }) => {
     dateRead: initialData.dateRead || "",
     coverImage: initialData.coverImage || "",
   });
+  const [imagePreview, setImagePreview] = useState(
+    initialData.coverImage || ""
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // If the field is coverImage, update the image preview
+    if (name === "coverImage") {
+      setImagePreview(value);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -63,6 +71,15 @@ const BookForm = ({ onSubmit, initialData = {} }) => {
             onChange={handleChange}
           />
         </Grid>
+        {imagePreview && (
+          <Grid item xs={12}>
+            <img
+              src={imagePreview}
+              alt="Cover Preview"
+              style={{ maxWidth: "100%", height: "auto", marginTop: 10 }}
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary">
             {initialData.id ? "Update Book" : "Add Book"}
